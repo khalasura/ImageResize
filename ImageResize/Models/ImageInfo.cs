@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace ImageResize.Models
         public string Size { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
-
+        public FileInfo _FileInfo { get; set; }
         public List<string> ToList()
         {
             var array = new List<string>();

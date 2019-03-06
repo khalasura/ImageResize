@@ -141,13 +141,15 @@ namespace ImageResize
 
             // 디렉토리 이미지 파일 검색
             string[] patterns = new[] { "*.jpg", "*.jpeg", "*.jpe", "*.jif", "*.jfif", "*.jfi", "*.webp", "*.gif", "*.png", "*.apng", "*.bmp", "*.dib", "*.tiff", "*.tif", "*.svg", "*.svgz", "*.ico", "*.xbm" };
-            var list = patterns.SelectMany(pattern => Directory.GetFiles(SelectedPath, pattern, SearchOption.AllDirectories)).Distinct().ToList();
+            //var list = patterns.SelectMany(pattern => Directory.GetFiles(SelectedPath, pattern, SearchOption.AllDirectories)).Distinct().ToList();
+            var di = new DirectoryInfo(SelectedPath);
+            var list = patterns.SelectMany(pattern => di.GetFiles(pattern, SearchOption.AllDirectories)).Distinct().ToList();
             pbLoadImage.Maximum = list.Count;
             array = new List<ImageInfo>();
             
             for (int i = 0; i < list.Count; i++)
             {
-                var g = list[i];
+                var g = list[i].FullName;
                 var fi = new FileInfo(g);
                 //var img = Image.FromFile(g);  // 속도 느림
 
@@ -159,6 +161,7 @@ namespace ImageResize
                     Size = string.Format("{0:0.0} KB", fi.Length / 1024F),
                     //With = img.Width,
                     //Height = img.Height
+                    _FileInfo = list[i],
                 };
 
                 using (Stream stream = File.OpenRead(g))
@@ -246,7 +249,13 @@ namespace ImageResize
                             }
 
                             // 확장자에 따른 이미지 포맷 결정 후 저장
-                            var path = txtSaveFolder.Text + "\\" + g.Name;
+                            //var path = txtSaveFolder.Text + "\\" + g.Name;
+                            // 선택된 폴더 하위로 원본폴더경로 추가  
+                            var path = txtSaveFolder.Text + g.Path.Substring(2);
+                            var di = txtSaveFolder.Text + g._FileInfo.DirectoryName.Substring(2);
+                            
+                            Directory.CreateDirectory(di);                           
+                            
                             var tmp = g.Name.Split('.');
                             var format = tmp[tmp.Length - 1];
                             switch (format.ToLower())
